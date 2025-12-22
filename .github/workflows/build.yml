@@ -1,4 +1,4 @@
-name: Build Kernels and Release
+name: Build ONYX GKI Kernel (KernelSU-Next + SuSFS)
 
 on:
   push:
@@ -8,59 +8,39 @@ on:
 jobs:
   build_kernel:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - sub_level: "50"
-            os_patch_level: "2024-10"
-          - sub_level: "56"
-            os_patch_level: "2024-11"
-          - sub_level: "57"
-            os_patch_level: "2024-12"
-          - sub_level: "58"
-            os_patch_level: "2025-01"
-          - sub_level: "66"
-            os_patch_level: "2025-02"
-          - sub_level: "77"
-            os_patch_level: "2025-03"
-          - sub_level: "82"
-            os_patch_level: "2025-04"
-          - sub_level: "87"
-            os_patch_level: "2025-05"
-          - sub_level: "89"
-            os_patch_level: "2025-06"
-          - sub_level: "98"
-            os_patch_level: "2025-07"
-          - sub_level: "102"
-            os_patch_level: "2025-09"
-          - sub_level: "X"
-            os_patch_level: "lts"
-    continue-on-error: true
+    continue-on-error: false
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-      - name: Set environment
+      - name: Set environment (ONYX)
         run: |
-          echo "ANDROID_VERSION=android15" >> $GITHUB_ENV
+          echo "ANDROID_VERSION=android14" >> $GITHUB_ENV
           echo "KERNEL_VERSION=6.6" >> $GITHUB_ENV
-          echo "SUB_LEVEL=${{ matrix.sub_level }}" >> $GITHUB_ENV
-          echo "OS_PATCH_LEVEL=${{ matrix.os_patch_level }}" >> $GITHUB_ENV
-          echo "DATE=$(TZ=Asia/Jakarta date +%Y%m%d%H%M)" >> $GITHUB_ENV
+          echo "SUB_LEVEL=auto" >> $GITHUB_ENV
+          echo "OS_PATCH_LEVEL=2025-06" >> $GITHUB_ENV
+          echo "DATE=$(TZ=Asia/Kolkata date +%Y%m%d%H%M)" >> $GITHUB_ENV
           echo "ARTIFACT=$GITHUB_WORKSPACE/artifact" >> $GITHUB_ENV
 
       - name: Make build.sh executable
         run: chmod +x ./build.sh
 
-      - name: Build kernel
+      - name: Build kernel (ONYX)
         run: |
-          mkdir -p ${{ env.ARTIFACT }}
-          ./build.sh ${{ env.ANDROID_VERSION }} ${{ env.KERNEL_VERSION }} ${{ env.SUB_LEVEL }} ${{ env.OS_PATCH_LEVEL }} ${{ env.DATE }} ${{ env.ARTIFACT }}
+          mkdir -p $ARTIFACT
+          ./build.sh \
+            $ANDROID_VERSION \
+            $KERNEL_VERSION \
+            $SUB_LEVEL \
+            $OS_PATCH_LEVEL \
+            $DATE \
+            $ARTIFACT
 
-      - name: Upload artifact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "kernel-${{ env.ANDROID_VERSION }}-${{ env.KERNEL_VERSION }}-${{ env.SUB_LEVEL }}-${{ env.OS_PATCH_LEVEL }}"
+          name: kernel-onyx-gki
           path: ${{ env.ARTIFACT }}/*
 
   create_release:
@@ -73,31 +53,39 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup git authentication
+      - name: Setup git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/kylieeXD/android_kernel_common-6.6
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
-      - name: Set DATE and TAG
+      - name: Set release tag
         run: |
-          DATE=$(TZ=Asia/Jakarta date +%Y%m%d%H%M)
-          echo "TAG=$DATE" >> $GITHUB_ENV
+          TAG="onyx-$(TZ=Asia/Kolkata date +%Y%m%d%H%M)"
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
       - name: Create Git tag
         run: |
-          git tag -a "$TAG" -m "SukiSU & SuSFS"
+          git tag -a "$TAG" -m "ONYX GKI 6.6 • KernelSU-Next + SuSFS"
           git push origin "$TAG"
 
-      - name: Download all artifacts
+      - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           path: artifact
 
-      - name: Upload artifacts to release
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.TAG }}
+          name: "ONYX GKI Kernel (KernelSU-Next + SuSFS)"
+          body: |
+            • Device: POCO F7 (onyx)
+            • Kernel: GKI 6.6
+            • Root: KernelSU-Next
+            • Filesystem: SuSFS
+            • No Samsung hacks
+            • Safe GKI build
           files: artifact/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
