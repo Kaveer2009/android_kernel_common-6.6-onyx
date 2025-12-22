@@ -14,8 +14,8 @@ jobs:
         include:
           - android_version: android15
             os_patch_level: 2025-06
-          - android_version: android16
-            os_patch_level: 2025-09
+          # - android_version: android16
+          #   os_patch_level: 2025-09
 
     steps:
       - name: Checkout source

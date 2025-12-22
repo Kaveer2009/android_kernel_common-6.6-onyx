@@ -84,11 +84,6 @@ export ACTUAL_SUBLEVEL="${ACTUAL_SUBLEVEL:-$sub_level}"
 # =========================
 curl -LSs https://raw.githubusercontent.com/Mr-Morat/KernelSU-Next/susfs/kernel/setup.sh | bash -s susfs
 
-cp "$KERNEL_PATCHES/next/kernelsu_and_susfs.patch" .
-cp "$KERNEL_PATCHES/next/fix-task_mmu.c" .
-
-patch -p1 < kernelsu_and_susfs.patch || patch -p1 < fix-task_mmu.c
-
 echo "CONFIG_KSU=y" >> "$DEFCONFIG"
 echo "CONFIG_KSU_MANUAL_HOOK=y" >> "$DEFCONFIG"
 echo "CONFIG_KSU_SUSFS=y" >> "$DEFCONFIG"
