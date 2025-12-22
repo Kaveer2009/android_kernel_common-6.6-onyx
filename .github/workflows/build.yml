@@ -2,7 +2,7 @@ name: Build ONYX GKI Kernel (Android 15 & 16)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ KernelSU-Next ]
   workflow_dispatch:
 
 jobs:
@@ -98,3 +98,4 @@ jobs:
           files: artifact/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
