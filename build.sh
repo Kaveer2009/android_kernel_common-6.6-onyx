@@ -82,19 +82,18 @@ export ACTUAL_SUBLEVEL="${ACTUAL_SUBLEVEL:-$sub_level}"
 # =========================
 # KernelSU-Next + SuSFS
 # =========================
-curl -LSs https://raw.githubusercontent.com/Mr-Morat/KernelSU-Next/susfs/kernel/setup.sh | bash -s susfs
+curl -LSs https://raw.githubusercontent.com/Mr-Morat/KernelSU-Next/kernel/setup.sh | bash
 # =========================
 # Add SuSFS (required for KernelSU-Next)
 # =========================
 git clone https://gitlab.com/simonpunk/susfs4ksu.git /tmp/susfs
 
-cp /tmp/susfs/kernel/fs/susfs.c common/fs/
-cp /tmp/susfs/kernel/include/linux/susfs.h common/include/linux/
-cp /tmp/susfs/kernel/include/linux/susfs_def.h common/include/linux/
+cp /tmp/susfs/kernel/fs/susfs.c fs/
+cp /tmp/susfs/kernel/include/linux/susfs.h include/linux/
+cp /tmp/susfs/kernel/include/linux/susfs_def.h include/linux/
 echo "CONFIG_SUSFS=y" >> "$DEFCONFIG"
 
-grep -q "susfs.o" common/fs/Makefile || echo "obj-y += susfs.o" >> common/fs/Makefile
-
+grep -q "susfs.o" fs/Makefile || echo "obj-y += susfs.o" >> fs/Makefile
 
 echo "CONFIG_KSU=y" >> "$DEFCONFIG"
 echo "CONFIG_KSU_MANUAL_HOOK=y" >> "$DEFCONFIG"
