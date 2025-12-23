@@ -88,9 +88,9 @@ curl -fsSL https://raw.githubusercontent.com/Mr-Morat/KernelSU-Next/master/kerne
 # =========================
 git clone https://gitlab.com/simonpunk/susfs4ksu.git /tmp/susfs
 
-cp /tmp/susfs/kernel/fs/susfs.c fs/
-cp /tmp/susfs/kernel/include/linux/susfs.h include/linux/
-cp /tmp/susfs/kernel/include/linux/susfs_def.h include/linux/
+cp /tmp/susfs/fs/susfs.c fs/
+cp /tmp/susfs/include/linux/susfs.h include/linux/
+cp /tmp/susfs/include/linux/susfs_def.h include/linux/
 echo "CONFIG_SUSFS=y" >> "$DEFCONFIG"
 
 grep -q "susfs.o" fs/Makefile || echo "obj-y += susfs.o" >> fs/Makefile
