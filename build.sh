@@ -82,7 +82,7 @@ export ACTUAL_SUBLEVEL="${ACTUAL_SUBLEVEL:-$sub_level}"
 # =========================
 # KernelSU-Next + SuSFS
 # =========================
-curl -LSs https://raw.githubusercontent.com/Mr-Morat/KernelSU-Next/kernel/setup.sh | bash
+curl -LSs https://raw.githubusercontent.com/Mr-Morat/KernelSU-Next/main/kernel/setup.sh | bash
 # =========================
 # Add SuSFS (required for KernelSU-Next)
 # =========================
